@@ -9,7 +9,6 @@ C:\Users\juan_\Documents\Projects\FinanceTracking\FinanceTracking\FinanceTrackin
 C:\Users\juan_\Documents\Projects\FinanceTracking\FinanceTracking\FinanceTracking\obj\Debug\netcoreapp2.1\FinanceTracking.csproj.CoreCompileInputs.cache
 C:\Users\juan_\Documents\Projects\FinanceTracking\FinanceTracking\FinanceTracking\obj\Debug\netcoreapp2.1\FinanceTracking.RazorAssemblyInfo.cache
 C:\Users\juan_\Documents\Projects\FinanceTracking\FinanceTracking\FinanceTracking\obj\Debug\netcoreapp2.1\FinanceTracking.RazorAssemblyInfo.cs
-C:\Users\juan_\Documents\Projects\FinanceTracking\FinanceTracking\FinanceTracking\obj\Debug\netcoreapp2.1\UserSecretsAssemblyInfo.cs
 C:\Users\juan_\Documents\Projects\FinanceTracking\FinanceTracking\FinanceTracking\obj\Debug\netcoreapp2.1\FinanceTracking.AssemblyInfoInputs.cache
 C:\Users\juan_\Documents\Projects\FinanceTracking\FinanceTracking\FinanceTracking\obj\Debug\netcoreapp2.1\FinanceTracking.AssemblyInfo.cs
 C:\Users\juan_\Documents\Projects\FinanceTracking\FinanceTracking\FinanceTracking\obj\Debug\netcoreapp2.1\FinanceTracking.TagHelpers.input.cache
@@ -33,3 +32,6 @@ C:\Users\juan_\Documents\Projects\FinanceTracking\FinanceTracking\FinanceTrackin
 C:\Users\juan_\Documents\Projects\FinanceTracking\FinanceTracking\FinanceTracking\obj\Debug\netcoreapp2.1\FinanceTracking.dll
 C:\Users\juan_\Documents\Projects\FinanceTracking\FinanceTracking\FinanceTracking\obj\Debug\netcoreapp2.1\FinanceTracking.pdb
 C:\Users\juan_\Documents\Projects\FinanceTracking\FinanceTracking\FinanceTracking\obj\Debug\netcoreapp2.1\FinanceTracking.csproj.CopyComplete
+C:\Users\juan_\Documents\Projects\FinanceTracking\FinanceTracking\FinanceTracking\obj\Debug\netcoreapp2.1\UserSecretsAssemblyInfo.cs
+C:\Users\juan_\Documents\Projects\FinanceTracking\FinanceTracking\FinanceTracking\obj\Debug\netcoreapp2.1\Razor\Views\Finance\ExpensesFeseability.g.cshtml.cs
+C:\Users\juan_\Documents\Projects\FinanceTracking\FinanceTracking\FinanceTracking\obj\Debug\netcoreapp2.1\Razor\Views\Finance\ExpensesAndIncomes.g.cshtml.cs
