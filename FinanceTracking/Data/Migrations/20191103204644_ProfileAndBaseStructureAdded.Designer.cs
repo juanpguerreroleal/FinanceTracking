@@ -4,14 +4,16 @@ using FinanceTracking.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FinanceTracking.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191103204644_ProfileAndBaseStructureAdded")]
+    partial class ProfileAndBaseStructureAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,48 +75,6 @@ namespace FinanceTracking.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ExpenseCategories");
-                });
-
-            modelBuilder.Entity("FinanceTracking.Models.Income", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("CreationDate");
-
-                    b.Property<string>("Description");
-
-                    b.Property<int>("IncomeSourceId");
-
-                    b.Property<string>("Name");
-
-                    b.Property<decimal>("Total");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IncomeSourceId");
-
-                    b.ToTable("Incomes");
-                });
-
-            modelBuilder.Entity("FinanceTracking.Models.IncomeSource", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("CreationDate");
-
-                    b.Property<string>("Description");
-
-                    b.Property<string>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("IncomeSources");
                 });
 
             modelBuilder.Entity("FinanceTracking.Models.JobCategory", b =>
@@ -365,21 +325,6 @@ namespace FinanceTracking.Data.Migrations
                         .WithMany()
                         .HasForeignKey("ExpenseCategoryId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("FinanceTracking.Models.Income", b =>
-                {
-                    b.HasOne("FinanceTracking.Models.IncomeSource", "IncomeSource")
-                        .WithMany()
-                        .HasForeignKey("IncomeSourceId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("FinanceTracking.Models.IncomeSource", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("FinanceTracking.Models.Profile", b =>
