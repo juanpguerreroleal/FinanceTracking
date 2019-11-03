@@ -13,7 +13,7 @@ namespace FinanceTracking.Models
         public Country Country { get; set; }
         [ForeignKey("CountryId")]
         [Required]
-        public string CountryId { get; set; }
+        public int CountryId { get; set; }
         [Required]
         public string Name { get; set; }
         public string Description { get; set; }

@@ -18,10 +18,6 @@ namespace FinanceTracking.Models
         public string LastName { get; set; }
         public string Address { get; set; }
         public int Age { get; set; }
-        //CountryForeignKey
-        public Country Country { get; set; }
-        [ForeignKey("CountryId")]
-        public int CountryId { get; set; }
         //StateForeignKey
         public State State { get; set; }
         [ForeignKey("StateId")]

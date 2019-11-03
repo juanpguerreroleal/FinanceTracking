@@ -144,8 +144,6 @@ namespace FinanceTracking.Data.Migrations
 
                     b.Property<int>("Age");
 
-                    b.Property<int>("CountryId");
-
                     b.Property<string>("FirstName");
 
                     b.Property<int>("JobCategoryId");
@@ -159,8 +157,6 @@ namespace FinanceTracking.Data.Migrations
                     b.Property<string>("UserId");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CountryId");
 
                     b.HasIndex("JobCategoryId");
 
@@ -177,10 +173,7 @@ namespace FinanceTracking.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("CountryId")
-                        .IsRequired();
-
-                    b.Property<int?>("CountryId1");
+                    b.Property<int>("CountryId");
 
                     b.Property<string>("Description");
 
@@ -189,7 +182,7 @@ namespace FinanceTracking.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CountryId1");
+                    b.HasIndex("CountryId");
 
                     b.ToTable("States");
                 });
@@ -384,11 +377,6 @@ namespace FinanceTracking.Data.Migrations
 
             modelBuilder.Entity("FinanceTracking.Models.Profile", b =>
                 {
-                    b.HasOne("FinanceTracking.Models.Country", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("FinanceTracking.Models.JobCategory", "JobCategory")
                         .WithMany()
                         .HasForeignKey("JobCategoryId")
@@ -408,7 +396,8 @@ namespace FinanceTracking.Data.Migrations
                 {
                     b.HasOne("FinanceTracking.Models.Country", "Country")
                         .WithMany()
-                        .HasForeignKey("CountryId1");
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\Migrations\20191103204644_ProfileAndBaseStructureAdded.cs" />
+    <Compile Remove="Data\Migrations\20191103204644_ProfileAndBaseStructureAdded.Designer.cs" />
+    <Compile Remove="Data\Migrations\20191103204801_IncomeModelsAdded.cs" />
+    <Compile Remove="Data\Migrations\20191103204801_IncomeModelsAdded.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.10" />
