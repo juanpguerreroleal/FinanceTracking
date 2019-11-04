@@ -1,0 +1,33 @@
+﻿@model List<FinanceTracking.Models.Expense>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Gastos</h2>
+
+<a asp-action="CreateExpense" class="btn btn-sm btn-primary">Create expense</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <td>Nombre</td>
+            <td>Descripcion</td>
+            <td>Total</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(Expense expense in Model){
+        <tr>
+            <td>
+                @expense.Name
+            </td>
+            <td>
+                @expense.Description
+            </td>
+            <td>
+                $ @expense.Total
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
