@@ -41,6 +41,18 @@
       "frameworks": {
         "netcoreapp2.1": {
           "dependencies": {
+            "Chart.js": {
+              "target": "Package",
+              "version": "[2.9.1, )"
+            },
+            "ChartJSCore": {
+              "target": "Package",
+              "version": "[1.5.5, )"
+            },
+            "Microsoft.AspNet.Mvc": {
+              "target": "Package",
+              "version": "[5.2.7, )"
+            },
             "Microsoft.AspNetCore.App": {
               "suppressParent": "All",
               "target": "Package",
@@ -61,6 +73,10 @@
             "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
               "target": "Package",
               "version": "[2.1.10, )"
+            },
+            "StackExchange.Redis": {
+              "target": "Package",
+              "version": "[2.0.601, )"
             }
           },
           "imports": [
