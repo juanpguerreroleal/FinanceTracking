@@ -121,6 +121,47 @@ namespace FinanceTracking.Controllers
 
             return View();
         }
-
+        public async Task<IActionResult> Profile()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var userId = user?.Id;
+            Profile profile = _db.Profiles.Where(x => x.UserId == userId).FirstOrDefault();
+            List<State> states = _db.States.ToList();
+            SelectList statesSelectList = new SelectList(states, "Id", "Name");
+            ViewBag.StateIds = statesSelectList;
+            List<JobCategory> jobCategories = _db.JobCategories.ToList();
+            SelectList jobCategoriesSelectList = new SelectList(jobCategories, "Id", "Name");
+            ViewBag.JobCategoryIds = jobCategoriesSelectList;
+            if (profile == null)
+            {
+                Profile newProfile = new Profile
+                {
+                    UserId = userId,
+                    StateId = 1,
+                    JobCategoryId = 1,
+                    Age = 18,
+                    Salary = 0
+                };
+                await _db.Profiles.AddAsync(newProfile);
+                await _db.SaveChangesAsync();
+                return View(newProfile);
+            }
+            return View(profile);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Profile(Profile profile)
+        {
+            if (profile != null)
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                var userId = user?.Id;
+                profile.UserId = userId;
+                _db.Profiles.Update(profile);
+                await _db.SaveChangesAsync();
+                return RedirectToAction("Profile");
+            }
+            return View();
+        }
     }
 }
