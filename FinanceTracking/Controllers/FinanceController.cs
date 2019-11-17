@@ -68,10 +68,16 @@ namespace FinanceTracking.Controllers
             var user = await _userManager.GetUserAsync(HttpContext.User);
             var userId = user.Id;
             List<Expense> listagastos = _db.Expenses.Where(x => x.UserId == userId).ToList();
-            chart.Type = Enums.ChartType.Line;
-            List<double> total = listagastos.Select(x => Convert.ToDouble(x.Total)).ToList();
-            List<double> totalmes= new List<double>() { 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0 };
+            List<Profile> listasalario = _db.Profiles.Where(x => x.UserId==userId).ToList();
 
+            chart.Type = Enums.ChartType.Line;
+
+            List<double> total = listagastos.Select(x => Convert.ToDouble(x.Total)).ToList();
+            List<double> totalsalario = listasalario.Select(x => Convert.ToDouble(x.Salary)).ToList();
+            double salariototal = totalsalario[0];
+            ViewBag.salariototal = salariototal;
+
+            List<double> totalmes= new List<double>() { 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0 };
             foreach (Expense item in listagastos)
             {
                 for (int i = 0; i <=11; i++)
@@ -84,13 +90,20 @@ namespace FinanceTracking.Controllers
                         totalmes.Insert(i, elemento);
                     }
                 }
-            }  
+            }
+
+            int indicemes = DateTime.Now.Month;
+            double gastototal = totalmes[indicemes-1];
+            double a = salariototal - gastototal;
+            double porcentaje = (a * 100) / salariototal;
+            ViewBag.porcentaje = porcentaje;
+
             ChartJSCore.Models.Data data = new ChartJSCore.Models.Data();
             data.Labels = new List<string>() { "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"};
 
             LineDataset dataset = new LineDataset()
             {
-                Label = "My First dataset",
+                Label = "Gastos por mes",
                 Data = totalmes,
                 Fill = "false",
                 LineTension = 0.1,
@@ -121,6 +134,7 @@ namespace FinanceTracking.Controllers
 
             return View();
         }
+
         public async Task<IActionResult> Profile()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
@@ -132,6 +146,7 @@ namespace FinanceTracking.Controllers
             List<JobCategory> jobCategories = _db.JobCategories.ToList();
             SelectList jobCategoriesSelectList = new SelectList(jobCategories, "Id", "Name");
             ViewBag.JobCategoryIds = jobCategoriesSelectList;
+
             if (profile == null)
             {
                 Profile newProfile = new Profile
