@@ -24,7 +24,7 @@
                 </div>
             </div>
             <div class="col-4 col-md-4">
-                <button class="btn btn-sm btn-primary" onclick="evaluateData()">Evaluar</button>
+                <button id="evaluateButton" class="btn btn-sm btn-primary" onclick="evaluateData()">Evaluar</button>
             </div>
         </div>
         <div class="row">
@@ -34,9 +34,23 @@
         </div>
     </div>
 </div>
-
-@section Scripts{
-<script>
+<div class="modal fade" role="dialog" id="trainingModel">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Entrenando modelo</h4>
+            </div>
+            <div class="modal-body">
+                <p>Estamos entrenando el modelo de prediccion para usted, porfavor espere y no cierre la pagina.</p>
+                <p>No se preocupe, el entrenamiento solo ocurre la primera vez que accede a esta pagina.</p>
+                <br />
+                <p>Esta ventana se cerrara cuando haya terminado el entrenamiento.</p>
+            </div>
+        </div>
+    </div>
+</div>
+        @section Scripts{
+            <script>
     var trainingXArray = [];
     var trainingYArray = [];
     var finalModel = null;
@@ -46,53 +60,69 @@
     }
 
     let run = async () => {
-        var modelTemp = await tf.loadLayersModel('indexeddb://my-model');
+        var modelTemp = null;
+        try {
+            modelTemp = await tf.loadLayersModel('indexeddb://my-model');
+        } catch (err) {
+            modelTemp = null;
+        }
         if (modelTemp == null) {
             console.log("Empty model");
             var trainingData = JSON.parse('@Json.Serialize(trainingItems)');
-        //console.log(JSON.parse('@Json.Serialize(trainingItems)'));
-        trainingData.forEach(addData);
-        console.log(trainingXArray);
-        console.log(trainingYArray);
-        const model = tf.sequential({
-            layers: [
-                tf.layers.dense({ inputShape: [6], units: 14, activation: 'sigmoid' }),
-                tf.layers.dense({ units: 14, activation: 'sigmoid' }),
-                tf.layers.dense({ units: 1, activation: 'sigmoid' }),
-            ]
-        });
-        model.weights.forEach(w => {
-            const newVals = tf.randomNormal(w.shape);
-            // w.val is an instance of tf.Variable
-            w.val.assign(newVals);
-        });
-        model.compile({
-            optimizer: tf.train.adam(.01),
-            loss: "binaryCrossentropy",
-            metrics: ['accuracy']
-        });
-        const inputTensor = tf.tensor2d(trainingXArray, [495, 6]);
-        const labelTensor = tf.tensor2d(trainingYArray, [495, 1]);
-        //Step 3. Normalize the data to the range 0 - 1 using min-max scaling
-        const inputMax = inputTensor.max();
-        const inputMin = inputTensor.min();
-        const labelMax = labelTensor.max();
-        const labelMin = labelTensor.min();
-        const normalizedInputs = inputTensor.sub(inputMin).div(inputMax.sub(inputMin));
-        const normalizedLabels = labelTensor.sub(labelMin).div(labelMax.sub(labelMin));
-        await model.fit(normalizedInputs, normalizedLabels, {
-            epochs: 400
-        }).then(info => {
-            console.log('Final accuracy', info);
-            const predictionTensor = tf.tensor2d([[5, 600, 3000, 21, 19, 0]], [1, 6]);
-            const inputMax = predictionTensor.max();
-            const inputMin = predictionTensor.min();
-            const normalizedInputs = predictionTensor.sub(inputMin).div(inputMax.sub(inputMin));
-            const prediction = model.predict(normalizedInputs).print();
-            console.log(prediction);
-        });
-        finalModel = model;
-        await model.save('indexeddb://my-model');
+            //console.log(JSON.parse('@Json.Serialize(trainingItems)'));
+            trainingData.forEach(addData);
+            console.log(trainingXArray);
+            console.log(trainingYArray);
+            const model = tf.sequential({
+                layers: [
+                    tf.layers.dense({ inputShape: [6], units: 1, activation: tf.layers.reLu }),
+                    tf.layers.dense({ units: 14, activation: tf.layers.reLu }),
+                    tf.layers.dense({ units: 1, activation: 'sigmoid' }),
+                ]
+            });
+            model.weights.forEach(w => {
+                const newVals = tf.randomNormal(w.shape);
+                // w.val is an instance of tf.Variable
+                w.val.assign(newVals);
+            });
+
+            model.compile({
+                optimizer: tf.train.adam(.01),
+                loss: "binaryCrossentropy",
+                lr: 0.1,
+                metrics: ['accuracy']
+            });
+            const inputTensor = tf.tensor2d(trainingXArray, [495, 6]);
+            const labelTensor = tf.tensor2d(trainingYArray, [495, 1]);
+            //Step 3. Normalize the data to the range 0 - 1 using min-max scaling
+            const inputMax = inputTensor.max();
+            const inputMin = inputTensor.min();
+            const labelMax = labelTensor.max();
+            const labelMin = labelTensor.min();
+            const normalizedInputs = inputTensor.sub(inputMin).div(inputMax.sub(inputMin));
+            const normalizedLabels = labelTensor.sub(labelMin).div(labelMax.sub(labelMin));
+            $("#evaluateButton").hide();
+            $("#trainingModel").show();
+            $("#trainingModel").addClass('show').removeClass('fade');
+            await model.fit(normalizedInputs, normalizedLabels, {
+                epochs: 350,
+                batchSize: 8
+            }).then(info => {
+                console.log('Final accuracy', info);
+                const predictionTensor = tf.tensor2d([[5, 600, 3000, 21, 19, 0]], [1, 6]);
+                const inputMax = predictionTensor.max();
+                const inputMin = predictionTensor.min();
+                const normalizedInputs = predictionTensor.sub(inputMin).div(inputMax.sub(inputMin));
+                const prediction = model.predict(normalizedInputs).print();
+                console.log(prediction);
+            });
+            finalModel = model;
+            $("#trainingModel").addClass('fade').removeClass('show');
+            $("#trainingModel").hide();
+            await model.save('indexeddb://my-model');
+            $("#evaluateButton").show();
+        } else {
+            tfvis.show.modelSummary({name: 'Modelo de datos'}, modelTemp);
         }
     }
     run();
@@ -100,14 +130,15 @@
         console.log("Evaluating");
         var category = $("#tipoGasto").children("option:selected").val();
         var expense = $("#gastoTotal").val();
+        var cId = parseInt(category);
+        var params = { CategoryId : cId  };
         $.ajax({
-            contentType: "application/json",
-            data: { CategoryId: category },
+            data: params,
             url: "@Url.Action("GetUserExpensesAndIncomes", "Finance")",
-            dataType: "json",
+            dataType: 'json',
             method: "post",
             success: function (response) {
-                var categoryId = parseInt(category);
+                var categoryId = cId;
                 var expenses = parseInt(expense) + response.totalExpense;
                 var salary = response.salaryPerMonth;
                 var age = response.age;
@@ -130,6 +161,7 @@
         const inputMin = predictionTensor.min();
         const normalizedInputs = predictionTensor.sub(inputMin).div(inputMax.sub(inputMin));
         const prediction = model.predict(normalizedInputs);
+        prediction.print();
         var predictionValue = prediction.dataSync()[0];
         if (predictionValue > 0.5) {
             $("#factibilidad").text("Factible").css("color", "#00ff00");
@@ -138,5 +170,5 @@
             $("#factibilidad").text("No es factible").css("color", "#ff0000");
         }
     };
-</script>
-}
+            </script>
+        }
