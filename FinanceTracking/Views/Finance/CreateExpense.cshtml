@@ -1,11 +1,11 @@
 ﻿@model FinanceTracking.Models.Expense
 
 @{
-    ViewData["Title"] = "CreateExpense";
+    ViewData["Title"] = "Crear gasto";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>CreateExpense</h2>
+<h2>Crear gasto</h2>
 
 <h4>Expense</h4>
 <hr />
@@ -34,7 +34,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="CreationDate" class="control-label"></label>
-                <input asp-for="CreationDate" class="form-control" />
+                <input asp-for="CreationDate" class="form-control" type="date" />
                 <span asp-validation-for="CreationDate" class="text-danger"></span>
             </div>
             <div class="form-group">

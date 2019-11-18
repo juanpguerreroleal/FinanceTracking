@@ -5,13 +5,22 @@
 
 <h2>Gastos</h2>
 
-<a asp-action="CreateExpense" class="btn btn-sm btn-primary">Create expense</a>
+<div class="row">
+    <div class="col-md-10">
 
-<table class="table">
+    </div>
+    <div class="col-md-2 right text-right">
+        <a asp-action="CreateExpense" class="btn btn-sm btn-primary">Crear gasto</a>
+    </div>
+</div>
+<br />
+<br />
+<table class="table table-bordered table-responsive">
     <thead>
         <tr>
             <td>Nombre</td>
             <td>Descripcion</td>
+            <td>Tipo de gasto</td>
             <td>Total</td>
         </tr>
     </thead>
@@ -23,6 +32,9 @@
             </td>
             <td>
                 @expense.Description
+            </td>
+            <td>
+                @expense.Category.Name
             </td>
             <td>
                 $ @expense.Total

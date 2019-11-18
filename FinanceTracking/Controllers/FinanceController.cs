@@ -40,15 +40,17 @@ namespace FinanceTracking.Controllers
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            List<Expense> expenseList = _db.Expenses.Where(x => x.UserId == user.Id).ToList();
+            List<Expense> expenseList = _db.Expenses.Include(x => x.Category).Where(x => x.UserId == user.Id).ToList();
             return View(expenseList);
         }
         public IActionResult CreateExpense()
         {
             List<ExpenseCategory> expenseCategories = _db.ExpenseCategories.ToList();
             SelectList expenseCategoriesSelectList = new SelectList(expenseCategories, "Id", "Name");
+            Expense expense = new Expense();
+            expense.CreationDate = DateTime.Now;
             ViewBag.ExpenseCategoryId = expenseCategoriesSelectList;
-            return View();
+            return View(expense);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
