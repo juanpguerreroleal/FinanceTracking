@@ -1,13 +1,11 @@
 ﻿@model FinanceTracking.Models.Profile
 
 @{
-    ViewData["Title"] = "Profile";
+    ViewData["Title"] = "Perfil";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>Profile</h2>
-
-<h4>Profile</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -15,48 +13,48 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
+                <label class="control-label">Nombres</label>
                 <input asp-for="FirstName" class="form-control" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="LastName" class="control-label"></label>
+                <label class="control-label">Apellidos</label>
                 <input asp-for="LastName" class="form-control" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Address" class="control-label"></label>
+                <label class="control-label">Direccion</label>
                 <input asp-for="Address" class="form-control" />
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Age" class="control-label"></label>
+                <label class="control-label">Edad</label>
                 <input asp-for="Age" class="form-control" />
                 <span asp-validation-for="Age" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="StateId" class="control-label"></label>
+                <label class="control-label">Estado</label>
                 <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateIds"></select>
                 <span asp-validation-for="StateId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="JobCategoryId" class="control-label"></label>
+                <label class="control-label">Ocupacion</label>
                 <select asp-for="JobCategoryId" class="form-control" asp-items="ViewBag.JobCategoryIds"></select>
                 <span asp-validation-for="JobCategoryId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Salary" class="control-label"></label>
+                <label class="control-label">Salario</label>
                 <input asp-for="Salary" class="form-control" />
                 <span asp-validation-for="Salary" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <input type="submit" value="Guardar" class="btn btn-default" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-controller="Home" asp-action="Index">Volver a inicio</a>
 </div>
 

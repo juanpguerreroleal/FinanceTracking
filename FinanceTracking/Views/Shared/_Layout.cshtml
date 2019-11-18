@@ -38,11 +38,10 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
-                    @if(User.Identity.IsAuthenticated)
+                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Inicio</a></li>
+                    @if (User.Identity.IsAuthenticated)
                     {
+                        <li><a asp-controller="Finance" asp-action="Incomes">Entradas</a></li>
                         <li><a asp-controller="Finance" asp-action="Index">Gastos</a></li>
                         <li><a asp-controller="Finance" asp-action="ExpensesFeseability">Factibilidad de gastos</a></li>
                         <li><a asp-controller="Finance" asp-action="ExpensesAndIncomes">Estadisticas</a></li>

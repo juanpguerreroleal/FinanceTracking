@@ -1,0 +1,47 @@
+﻿@model List<Income>
+@{
+    ViewData["Title"] = "Entradas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Entradas monetarias</h2>
+
+<div class="row">
+    <div class="col-md-10">
+
+    </div>
+    <div class="col-md-2 right text-right">
+        <a asp-action="CreateIncome" class="btn btn-sm btn-primary">Crear entrada</a>
+    </div>
+</div>
+<br />
+<br />
+<table class="table table-bordered table-responsive">
+    <thead>
+        <tr>
+            <td>Nombre</td>
+            <td>Descripcion</td>
+            <td>Fuente</td>
+            <td>Total</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Income income in Model)
+        {
+            <tr>
+                <td>
+                    @income.Name
+                </td>
+                <td>
+                    @income.Description
+                </td>
+                <td>
+                    @income.IncomeSource.Description
+                </td>
+                <td>
+                    $ @income.Total
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

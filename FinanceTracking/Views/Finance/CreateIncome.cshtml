@@ -1,19 +1,19 @@
-﻿@model FinanceTracking.Models.Expense
+﻿@model FinanceTracking.Models.Income
 
 @{
-    ViewData["Title"] = "Crear gasto";
+    ViewData["Title"] = "Crear entrada";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Crear gasto</h2>
+<h2>Crear entrada de dinero</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="CreateExpense">
+        <form asp-action="CreateIncome">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label class="control-label">Tipo de gasto</label>
-                <select asp-for="ExpenseCategoryId" class ="form-control" asp-items="ViewBag.ExpenseCategoryId"></select>
+                <label class="control-label">Fuente de ingreso</label>
+                <select asp-for="IncomeSourceId" class ="form-control" asp-items="ViewBag.incomeSources"></select>
             </div>
             <div class="form-group">
                 <label class="control-label">Nombre</label>
@@ -26,13 +26,13 @@
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label class="control-label">Total a gastar</label>
+                <label class="control-label">Total de entrada</label>
                 <input asp-for="Total" class="form-control" />
                 <span asp-validation-for="Total" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label class="control-label">Fecha del gasto</label>
-                <input asp-for="CreationDate" class="form-control" type="date" />
+                <label class="control-label">Fecha de entrada</label>
+                <input asp-for="CreationDate" class="form-control" type="date"/>
                 <span asp-validation-for="CreationDate" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -43,6 +43,6 @@
 </div>
 
 <div>
-    <a asp-action="Index">Volver al listado</a>
+    <a asp-action="Incomes">Volver al listado</a>
 </div>
 

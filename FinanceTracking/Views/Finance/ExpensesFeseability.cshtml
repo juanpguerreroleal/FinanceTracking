@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "ExpensesFeseability";
+    ViewData["Title"] = "Factibilidad de gasto";
     var tsUrl = (string)ViewBag.tsUrl;
     var trainingItems = (List<FinanceTracking.Models.ViewModels.FeseabilityItem>)ViewBag.TrainingItems;
 }
@@ -122,7 +122,6 @@
             await model.save('indexeddb://my-model');
             $("#evaluateButton").show();
         } else {
-            tfvis.show.modelSummary({name: 'Modelo de datos'}, modelTemp);
         }
     }
     run();

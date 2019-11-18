@@ -68,6 +68,52 @@ namespace FinanceTracking.Controllers
             }
             return View(expense);
         }
+        public async Task<IActionResult> Incomes()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            List<Income> incomesList = _db.Incomes.Include(x => x.IncomeSource).Where(x => x.IncomeSource.UserId == user.Id).ToList();
+            return View(incomesList);
+        }
+        public async Task<IActionResult> CreateIncome()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var userId = user?.Id;
+            List<IncomeSource> incomeSources = _db.IncomeSources.Where(x => x.UserId == userId).ToList();
+            if (incomeSources.Count == 0)
+            {
+                IncomeSource newIncomeSource = new IncomeSource
+                {
+                    UserId = userId,
+                    Description = "Pago externo a salario",
+                    CreationDate = DateTime.Now
+                };
+                await _db.IncomeSources.AddAsync(newIncomeSource);
+                await _db.SaveChangesAsync();
+                incomeSources = _db.IncomeSources.Where(x => x.UserId == userId).ToList();
+            }
+            SelectList incomeSourcesSelectList = new SelectList(incomeSources, "Id", "Description");
+            Income income = new Income();
+            income.CreationDate = DateTime.Now;
+            ViewBag.incomeSources = incomeSourcesSelectList;
+            return View(income);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateIncome(Income income)
+        {
+            ModelState.Remove("UserId");
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var userId = user?.Id;
+            if (ModelState.IsValid)
+            {
+                await _db.Incomes.AddAsync(income);
+                await _db.SaveChangesAsync();
+                return RedirectToAction(nameof(Incomes));
+            }
+            return View(income);
+        }
+
+
         //Factibilidad de gastos
         public async Task<IActionResult> ExpensesFeseability() {
             var csvLocation = Path.Combine(Request.GetDisplayUrl().Replace("Finance/ExpensesFeseability", "") + "TensorModels/factibilityExpenseDataSet.csv");
