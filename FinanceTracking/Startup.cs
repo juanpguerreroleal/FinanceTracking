@@ -69,6 +69,11 @@ namespace FinanceTracking
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+            app.Use(async (context, next) => {
+                //Do what you want with context,which is HttpContext
+                var rq = context.Request;
+                await next.Invoke();
+            });
         }
     }
 }

@@ -25,6 +25,11 @@
   <ItemGroup>
     <Folder Include="Areas\Identity\Services\" />
     <Folder Include="wwwroot\lib\Chart.js\" />
+    <Folder Include="wwwroot\TensorModels\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\TensorModels\model.h5" />
   </ItemGroup>
 
 </Project>

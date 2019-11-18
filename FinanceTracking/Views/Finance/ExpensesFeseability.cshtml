@@ -1,7 +1,142 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "ExpensesFeseability";
+    var tsUrl = (string)ViewBag.tsUrl;
+    var trainingItems = (List<FinanceTracking.Models.ViewModels.FeseabilityItem>)ViewBag.TrainingItems;
 }
 
-<h2>ExpensesFeseability</h2>
+<h2>Factibilidad de gastos</h2>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h2>Factibilidad de gasto unitario</h2>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-4 col-md-4">
+                <div class="form-group">
+                    <label class="control-label">Total gasto</label><br />
+                    <input type="number" id="gastoTotal" value="0" />
+                </div>
+            </div>
+            <div class="col-4 col-md-4">
+                <div class="form-group">
+                    <label class="control-label">Tipo de gasto</label>
+                    <select class="form-control" asp-items="ViewBag.ExpenseCategoryId" id="tipoGasto"></select>
+                </div>
+            </div>
+            <div class="col-4 col-md-4">
+                <button class="btn btn-sm btn-primary" onclick="evaluateData()">Evaluar</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-12">
+                <h3 id="factibilidad"></h3>
+            </div>
+        </div>
+    </div>
+</div>
 
+@section Scripts{
+<script>
+    var trainingXArray = [];
+    var trainingYArray = [];
+    var finalModel = null;
+    function addData(item, index) {
+        trainingXArray.push([item.categoryId, item.totalExpense, item.salaryPerMonth, item.age, item.stateId, item.totalIncomes]);
+        trainingYArray.push(item.factibility);
+    }
+
+    let run = async () => {
+        var modelTemp = await tf.loadLayersModel('indexeddb://my-model');
+        if (modelTemp == null) {
+            console.log("Empty model");
+            var trainingData = JSON.parse('@Json.Serialize(trainingItems)');
+        //console.log(JSON.parse('@Json.Serialize(trainingItems)'));
+        trainingData.forEach(addData);
+        console.log(trainingXArray);
+        console.log(trainingYArray);
+        const model = tf.sequential({
+            layers: [
+                tf.layers.dense({ inputShape: [6], units: 14, activation: 'sigmoid' }),
+                tf.layers.dense({ units: 14, activation: 'sigmoid' }),
+                tf.layers.dense({ units: 1, activation: 'sigmoid' }),
+            ]
+        });
+        model.weights.forEach(w => {
+            const newVals = tf.randomNormal(w.shape);
+            // w.val is an instance of tf.Variable
+            w.val.assign(newVals);
+        });
+        model.compile({
+            optimizer: tf.train.adam(.01),
+            loss: "binaryCrossentropy",
+            metrics: ['accuracy']
+        });
+        const inputTensor = tf.tensor2d(trainingXArray, [495, 6]);
+        const labelTensor = tf.tensor2d(trainingYArray, [495, 1]);
+        //Step 3. Normalize the data to the range 0 - 1 using min-max scaling
+        const inputMax = inputTensor.max();
+        const inputMin = inputTensor.min();
+        const labelMax = labelTensor.max();
+        const labelMin = labelTensor.min();
+        const normalizedInputs = inputTensor.sub(inputMin).div(inputMax.sub(inputMin));
+        const normalizedLabels = labelTensor.sub(labelMin).div(labelMax.sub(labelMin));
+        await model.fit(normalizedInputs, normalizedLabels, {
+            epochs: 400
+        }).then(info => {
+            console.log('Final accuracy', info);
+            const predictionTensor = tf.tensor2d([[5, 600, 3000, 21, 19, 0]], [1, 6]);
+            const inputMax = predictionTensor.max();
+            const inputMin = predictionTensor.min();
+            const normalizedInputs = predictionTensor.sub(inputMin).div(inputMax.sub(inputMin));
+            const prediction = model.predict(normalizedInputs).print();
+            console.log(prediction);
+        });
+        finalModel = model;
+        await model.save('indexeddb://my-model');
+        }
+    }
+    run();
+    function evaluateData() {
+        console.log("Evaluating");
+        var category = $("#tipoGasto").children("option:selected").val();
+        var expense = $("#gastoTotal").val();
+        $.ajax({
+            contentType: "application/json",
+            data: { CategoryId: category },
+            url: "@Url.Action("GetUserExpensesAndIncomes", "Finance")",
+            dataType: "json",
+            method: "post",
+            success: function (response) {
+                var categoryId = parseInt(category);
+                var expenses = parseInt(expense) + response.totalExpense;
+                var salary = response.salaryPerMonth;
+                var age = response.age;
+                var stateId = response.stateId;
+                var incomes = response.totalIncomes;
+                predict(categoryId, expenses, salary, age, stateId, incomes);
+            },
+            error: function () {
+                console.log("Ocurrio un error");
+                alert("No se pudo conectar al servidor");
+            }
+        }).done(function () {
+
+        });
+    }
+    let predict = async (categoryId, expenses, salary, age, stateId, incomes) => {
+        const model = await tf.loadLayersModel('indexeddb://my-model');
+        const predictionTensor = tf.tensor2d([[categoryId, expenses, salary, age, stateId, incomes]], [1, 6]);
+        const inputMax = predictionTensor.max();
+        const inputMin = predictionTensor.min();
+        const normalizedInputs = predictionTensor.sub(inputMin).div(inputMax.sub(inputMin));
+        const prediction = model.predict(normalizedInputs);
+        var predictionValue = prediction.dataSync()[0];
+        if (predictionValue > 0.5) {
+            $("#factibilidad").text("Factible").css("color", "#00ff00");
+        }
+        else {
+            $("#factibilidad").text("No es factible").css("color", "#ff0000");
+        }
+    };
+</script>
+}

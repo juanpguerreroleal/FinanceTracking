@@ -12,6 +12,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using ChartJSCore.Models;
 using StackExchange.Redis;
 using ChartJSCore.Helpers;
+using Microsoft.EntityFrameworkCore;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Extensions;
+using FinanceTracking.Models.ViewModels;
+using Newtonsoft.Json;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -22,10 +28,12 @@ namespace FinanceTracking.Controllers
     {
         public readonly UserManager<IdentityUser> _userManager;
         public readonly ApplicationDbContext _db;
-        public FinanceController(UserManager<IdentityUser> userManager, ApplicationDbContext db)
+        private readonly IHostingEnvironment _env;
+        public FinanceController(UserManager<IdentityUser> userManager, ApplicationDbContext db, IHostingEnvironment env)
         {
             _userManager = userManager;
             _db = db;
+            _env = env;
         }
 
         // GET: /<controller>/
@@ -59,8 +67,64 @@ namespace FinanceTracking.Controllers
             return View(expense);
         }
         //Factibilidad de gastos
-        public IActionResult ExpensesFeseability() {
+        public async Task<IActionResult> ExpensesFeseability() {
+            var csvLocation = Path.Combine(Request.GetDisplayUrl().Replace("Finance/ExpensesFeseability", "") + "TensorModels/factibilityExpenseDataSet.csv");
+            List<FeseabilityItem> csvItems = new List<FeseabilityItem>();
+            List<ExpenseCategory> expenseCategories = _db.ExpenseCategories.ToList();
+            SelectList expenseCategoriesSelectList = new SelectList(expenseCategories, "Id", "Name");
+            ViewBag.ExpenseCategoryId = expenseCategoriesSelectList;
+            using (var reader = new StreamReader("wwwroot/TensorModels/factibilityExpenseDataSetFixed.csv"))
+            {
+                var cont = 0;
+                while (!reader.EndOfStream)
+                {
+                    FeseabilityItem item = new FeseabilityItem();
+                    var line = reader.ReadLine();
+                    var values = line.Split(',');
+                    if (cont != 0)
+                    {
+                        item.CategoryId = Convert.ToInt32(values[0]);
+                        item.TotalExpense = Convert.ToInt32(values[1]);
+                        item.SalaryPerMonth = Convert.ToInt32(values[2]);
+                        item.Age = Convert.ToInt32(values[3]);
+                        item.StateId = Convert.ToInt32(values[4]);
+                        item.TotalIncomes = Convert.ToInt32(values[5]);
+                        item.Factibility = Convert.ToInt32(values[6]);
+                        csvItems.Add(item);
+                    }
+                    cont++;
+                }
+            }
+            ViewBag.TrainingItems = csvItems;
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var userId = user.Id;
+            ViewBag.tsUrl = Path.Combine(Request.GetDisplayUrl().Replace("Finance/ExpensesFeseability", "") + "TensorModels/model.");
             return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> GetUserExpensesAndIncomes(int CategoryId)
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var userId = user.Id;
+            List<Expense> listaGastos = _db.Expenses.Where(x => x.UserId == userId && x.CreationDate > DateTime.Now.AddDays(-30) && x.ExpenseCategoryId == CategoryId).ToList();
+            List<Income> listaEntradasDinero = _db.Incomes.Include(x => x.IncomeSource).Where(x => x.IncomeSource.UserId == userId && x.CreationDate > DateTime.Now.AddDays(-30)).ToList();
+            Profile profile = await _db.Profiles.Where(x => x.UserId == userId).FirstOrDefaultAsync();
+            FeseabilityItem item = new FeseabilityItem() {
+                TotalExpense = 0,
+                TotalIncomes = 0,
+                Age = profile.Age,
+                SalaryPerMonth = Convert.ToInt32(profile.Salary),
+                StateId = profile.StateId
+            };
+            foreach(Expense expense in listaGastos)
+            {
+                item.TotalExpense += Convert.ToInt32(expense.Total);
+            }
+            foreach (Income income in listaEntradasDinero)
+            {
+                item.TotalIncomes += Convert.ToInt32(income.Total);
+            }
+            return Json(item);
         }
         //Estadisticas y clasificacion de nivel de gastos
         public async Task<IActionResult> ExpensesAndIncomes() {
