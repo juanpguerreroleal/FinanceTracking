@@ -18,15 +18,32 @@
         </div>
     </div>
 </div>
-<h3>Gastos por mes en el año actual </h3>
-<div><canvas id="lineChart"></canvas></div>
-
-@{ChartJSCore.Models.Chart chart = (ChartJSCore.Models.Chart)ViewData["chart"]; }
+<div class="row">
+    <div class="col-md-6">
+        <h3>Gastos por mes en el año actual </h3>
+        <div><canvas id="lineChart"></canvas></div>
+        @{ChartJSCore.Models.Chart chart = (ChartJSCore.Models.Chart)ViewData["expenses"]; }
+    </div>
+    <div class="col-md-6">
+        <h3>Entradas por mes en el año actual </h3>
+        <div><canvas id="lineChart2"></canvas></div>
+        @{ChartJSCore.Models.Chart chartIncomes = (ChartJSCore.Models.Chart)ViewData["incomes"]; }
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h3>Balance por mes en el año actual </h3>
+        <div><canvas id="lineChart3"></canvas></div>
+        @{ChartJSCore.Models.Chart chartBalance = (ChartJSCore.Models.Chart)ViewData["balance"]; }
+    </div>
+</div>
 
 @section Scripts {
     <script src="~/lib/Chart.js/dist/Chart.js"></script>
     <script>
         @Html.Raw(chart.CreateChartCode("lineChart"));
+        @Html.Raw(chartIncomes.CreateChartCode("lineChart2"));
+        @Html.Raw(chartBalance.CreateChartCode("lineChart3"));
     </script>
 
     <script type="text/javascript">

@@ -176,20 +176,34 @@ namespace FinanceTracking.Controllers
         }
         //Estadisticas y clasificacion de nivel de gastos
         public async Task<IActionResult> ExpensesAndIncomes() {
+            //Chart instance
             Chart chart = new Chart();
+            Chart chartIncomes = new Chart();
+            Chart chartBalance = new Chart();
+            //Getting the user and setting the userId
             var user = await _userManager.GetUserAsync(HttpContext.User);
             var userId = user.Id;
+            //User expenses
             List<Expense> listagastos = _db.Expenses.Where(x => x.UserId == userId).ToList();
+            //User profile
             List<Profile> listasalario = _db.Profiles.Where(x => x.UserId==userId).ToList();
-
+            //User incomes
+            List<Income> listaentradas = _db.Incomes.Include(x => x.IncomeSource).Where(x => x.IncomeSource.UserId == userId).ToList();
+            //Setting the chart type
             chart.Type = Enums.ChartType.Line;
-
+            chartIncomes.Type = Enums.ChartType.Line;
+            chartBalance.Type = Enums.ChartType.Line;
+            //Extracting the expenses data
             List<double> total = listagastos.Select(x => Convert.ToDouble(x.Total)).ToList();
             List<double> totalsalario = listasalario.Select(x => Convert.ToDouble(x.Salary)).ToList();
             double salariototal = totalsalario[0];
             ViewBag.salariototal = salariototal;
+            //Extracting the incomes data
+            List<double> totalIncomes = listagastos.Select(x => Convert.ToDouble(x.Total)).ToList();
 
-            List<double> totalmes= new List<double>() { 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0 };
+            List<double> totalmes = new List<double>() { 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0 };
+            List<double> totalEntradasMes = new List<double>() { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            List<double> totalBalance = new List<double>() { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             foreach (Expense item in listagastos)
             {
                 for (int i = 0; i <=11; i++)
@@ -203,16 +217,41 @@ namespace FinanceTracking.Controllers
                     }
                 }
             }
-
+            foreach (Income item in listaentradas)
+            {
+                for (int i =0; i <= 11; i++)
+                {
+                    if (item.CreationDate.Month-1 == i)
+                    {
+                        var elemento = totalEntradasMes.ElementAt(i);
+                        elemento += Convert.ToDouble(item.Total);
+                        totalEntradasMes.RemoveAt(i);
+                        totalEntradasMes.Insert(i, elemento);
+                    }
+                }
+            }
+            for (int i = 0; i <= 11; i++)
+            {
+                double monthBalance = salariototal - totalmes.ElementAt(i) - totalEntradasMes.ElementAt(i);
+                totalBalance.RemoveAt(i);
+                totalBalance.Insert(i, monthBalance);
+            }
             int indicemes = DateTime.Now.Month;
             double gastototal = totalmes[indicemes-1];
             double a = salariototal - gastototal;
             double porcentaje = (a * 100) / salariototal;
             ViewBag.porcentaje = porcentaje;
-
+            //Data object for expenses
             ChartJSCore.Models.Data data = new ChartJSCore.Models.Data();
-            data.Labels = new List<string>() { "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"};
-
+            //Data object for incomes
+            ChartJSCore.Models.Data dataIncomes = new ChartJSCore.Models.Data();
+            //Data object for balance
+            ChartJSCore.Models.Data dataBalance = new ChartJSCore.Models.Data();
+            List<string> months = new List<string>() { "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" };
+            data.Labels = months;
+            dataIncomes.Labels = months;
+            dataBalance.Labels = months;
+            //Dataset for expenses chart
             LineDataset dataset = new LineDataset()
             {
                 Label = "Gastos por mes",
@@ -236,13 +275,71 @@ namespace FinanceTracking.Controllers
                 PointHitRadius = new List<int> { 10 },
                 SpanGaps = false
             };
+            //Dataset for incomes chart
+            LineDataset datasetIncomes = new LineDataset()
+            {
+                Label = "Entradas por mes",
+                Data = totalEntradasMes,
+                Fill = "false",
+                LineTension = 0.1,
+                BackgroundColor = ChartColor.FromRgba(75, 192, 192, 0.4),
+                BorderColor = ChartColor.FromRgb(75, 192, 192),
+                BorderCapStyle = "butt",
+                BorderDash = new List<int> { },
+                BorderDashOffset = 0.0,
+                BorderJoinStyle = "miter",
+                PointBorderColor = new List<ChartColor> { ChartColor.FromRgb(75, 192, 192) },
+                PointBackgroundColor = new List<ChartColor> { ChartColor.FromHexString("#ffffff") },
+                PointBorderWidth = new List<int> { 1 },
+                PointHoverRadius = new List<int> { 5 },
+                PointHoverBackgroundColor = new List<ChartColor> { ChartColor.FromRgb(75, 192, 192) },
+                PointHoverBorderColor = new List<ChartColor> { ChartColor.FromRgb(220, 220, 220) },
+                PointHoverBorderWidth = new List<int> { 2 },
+                PointRadius = new List<int> { 1 },
+                PointHitRadius = new List<int> { 10 },
+                SpanGaps = false
+            };
+            //Dataset for balance chart
+            LineDataset datasetBalance = new LineDataset()
+            {
+                Label = "Balance por mes",
+                Data = totalBalance,
+                Fill = "false",
+                LineTension = 0.1,
+                BackgroundColor = ChartColor.FromRgba(75, 192, 192, 0.4),
+                BorderColor = ChartColor.FromRgb(75, 192, 192),
+                BorderCapStyle = "butt",
+                BorderDash = new List<int> { },
+                BorderDashOffset = 0.0,
+                BorderJoinStyle = "miter",
+                PointBorderColor = new List<ChartColor> { ChartColor.FromRgb(75, 192, 192) },
+                PointBackgroundColor = new List<ChartColor> { ChartColor.FromHexString("#ffffff") },
+                PointBorderWidth = new List<int> { 1 },
+                PointHoverRadius = new List<int> { 5 },
+                PointHoverBackgroundColor = new List<ChartColor> { ChartColor.FromRgb(75, 192, 192) },
+                PointHoverBorderColor = new List<ChartColor> { ChartColor.FromRgb(220, 220, 220) },
+                PointHoverBorderWidth = new List<int> { 2 },
+                PointRadius = new List<int> { 1 },
+                PointHitRadius = new List<int> { 10 },
+                SpanGaps = false
+            };
 
             data.Datasets = new List<Dataset>();
             data.Datasets.Add(dataset);
-
             chart.Data = data;
 
-            ViewData["chart"] = chart;
+            dataIncomes.Datasets = new List<Dataset>();
+            dataIncomes.Datasets.Add(datasetIncomes);
+            chartIncomes.Data = dataIncomes;
+
+            dataBalance.Datasets = new List<Dataset>();
+            dataBalance.Datasets.Add(datasetBalance);
+            chartBalance.Data = dataBalance;
+
+            //Sending data to the view
+            ViewData["expenses"] = chart;
+            ViewData["incomes"] = chartIncomes;
+            ViewData["balance"] = chartBalance;
 
             return View();
         }

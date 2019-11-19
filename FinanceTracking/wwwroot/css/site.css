@@ -35,3 +35,10 @@ body {
         display: none;
     }
 }
+
+.panel-heading{
+    background-color: #222 !important;
+}
+.panel{
+    border-bottom-color: #080808 !important;
+}
