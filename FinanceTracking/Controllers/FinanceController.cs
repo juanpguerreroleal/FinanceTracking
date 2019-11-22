@@ -68,6 +68,31 @@ namespace FinanceTracking.Controllers
             }
             return View(expense);
         }
+        public async Task<IActionResult> EditExpense(int Id)
+        {
+            Expense expense = _db.Expenses.Where(x => x.Id == Id).FirstOrDefault();
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var userId = user?.Id;
+            List<ExpenseCategory> expenseCategories = _db.ExpenseCategories.ToList();
+            SelectList expenseCategoriesSelectList = new SelectList(expenseCategories, "Id", "Name");
+            ViewBag.ExpenseCategoryId = expenseCategoriesSelectList;
+            if (expense == null)
+            {
+                return RedirectToAction("Index");
+            }
+            return View(expense);
+        }
+        [HttpPost]
+        public async Task<IActionResult> EditExpense(Expense expense)
+        {
+            ModelState.Remove("UserId");
+            if (ModelState.IsValid)
+            {
+                _db.Expenses.Update(expense);
+                await _db.SaveChangesAsync();
+            }
+            return RedirectToAction("Index", "Finance");
+        }
         public async Task<IActionResult> Incomes()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
@@ -112,7 +137,30 @@ namespace FinanceTracking.Controllers
             }
             return View(income);
         }
-
+        public async Task<IActionResult> EditIncome(int Id)
+        {
+            Income income = _db.Incomes.Where(x => x.Id == Id).FirstOrDefault();
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var userId = user?.Id;
+            List<IncomeSource> incomeSources = _db.IncomeSources.Where(x => x.UserId == userId).ToList();
+            SelectList incomeSourcesSelectList = new SelectList(incomeSources, "Id", "Description");
+            ViewBag.incomeSources = incomeSourcesSelectList;
+            if (income == null)
+            {
+                return Redirect("Incomes");
+            }
+            return View(income);
+        }
+        [HttpPost]
+        public async Task<IActionResult> EditIncome(Income income)
+        {
+            if (ModelState.IsValid)
+            {
+                _db.Incomes.Update(income);
+                await _db.SaveChangesAsync();
+            }
+            return RedirectToAction("Incomes", "Finance");
+        }
 
         //Factibilidad de gastos
         public async Task<IActionResult> ExpensesFeseability() {

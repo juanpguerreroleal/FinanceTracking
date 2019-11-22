@@ -23,6 +23,7 @@
             <td>Descripcion</td>
             <td>Fuente</td>
             <td>Total</td>
+            <td>Acciones</td>
         </tr>
     </thead>
     <tbody>
@@ -40,6 +41,9 @@
                 </td>
                 <td>
                     $ @income.Total
+                </td>
+                <td>
+                    <a href="@Url.Action("EditIncome", "Finance", new { Id = income.Id })" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-edit"></span>Editar</a>
                 </td>
             </tr>
         }

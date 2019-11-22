@@ -22,6 +22,7 @@
             <td>Descripcion</td>
             <td>Tipo de gasto</td>
             <td>Total</td>
+            <td>Acciones</td>
         </tr>
     </thead>
     <tbody>
@@ -38,6 +39,9 @@
             </td>
             <td>
                 $ @expense.Total
+            </td>
+            <td>
+                <a href="@Url.Action("EditExpense", "Finance", new { Id = expense.Id })" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-edit"></span>Editar</a>
             </td>
         </tr>
         }

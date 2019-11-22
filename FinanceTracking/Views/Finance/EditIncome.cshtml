@@ -1,0 +1,49 @@
+﻿@model FinanceTracking.Models.Income
+
+@{
+    ViewData["Title"] = "EditIncome";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Editar entrada</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditIncome">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label class="control-label">Fuente de ingreso</label>
+                <select id="IncomeSourceId" asp-for="IncomeSourceId" class="form-control" asp-items="ViewBag.incomeSources"></select>
+                <span asp-validation-for="IncomeSourceId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Nombre</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Descripcion</label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Total" class="control-label"></label>
+                <input asp-for="Total" class="form-control" />
+                <span asp-validation-for="Total" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Fecha de creacion</label>
+                <input asp-for="CreationDate" class="form-control" type="date"/>
+                <span asp-validation-for="CreationDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Guardar" class="btn btn-success" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Incomes">Volver al listado</a>
+</div>
